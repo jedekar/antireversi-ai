@@ -1,3 +1,2 @@
-reversi/__pycache__/
-!.idea/
-venv/
+src/*.exe
+tests/*.exe
