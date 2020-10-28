@@ -1,6 +1,9 @@
 import tables, sequtils
 
 const FieldSize* = 8
+const Empty* = ' '
+const Black* = 'b'
+const White* = 'w'
 
 
 type CellIndex* = tuple
@@ -23,21 +26,21 @@ type Reversi* = ref object
     blackHole: CellIndex
 
 proc newReversi*(blackHole: CellIndex): Reversi =
-    let field = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                 [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                 [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                 [' ', ' ', ' ', 'w', 'b', ' ', ' ', ' '],
-                 [' ', ' ', ' ', 'b', 'w', ' ', ' ', ' '],
-                 [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                 [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                 [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    let field = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, White, Black, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Black, White, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+                 [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
     return Reversi(field: field, blackHole: blackHole)
 
 
 proc inverseof(color: char): char =
-    if color == 'b':
-        return 'w'
-    return 'b'
+    if color == Black:
+        return White
+    return Black
 
 
 proc isValidIndex(cellIndex: CellIndex): bool =
@@ -84,7 +87,7 @@ proc findEmptyCell(self: Reversi, cellIndex: CellIndex, direction: Direction): C
         let current = self.field[y][x]
         if current == inverse:
             return InvalidCell
-        if current == ' ':
+        if current == Empty:
             return (y, x)
         if current == color:
             y += direction.y
@@ -168,8 +171,8 @@ proc flipPieces(self: Reversi, attacked: CellIndex, attackers: seq[CellIndex]) =
 
 
 proc isFinished*(self: Reversi): bool =
-    let blackCoverage = self.getCoverage('b')
-    let whiteCoverage = self.getCoverage('w')
+    let blackCoverage = self.getCoverage(Black)
+    let whiteCoverage = self.getCoverage(White)
     if len(blackCoverage) == 0 and len(whiteCoverage) == 0:
         return true
     return false
@@ -181,7 +184,7 @@ proc makeTurn*(self: Reversi, cellIndex: CellIndex, color: char) =
 
 
 proc calculateScore*(self: Reversi): (int, int) =
-    var black = len(self.getPieces('b'))
-    var white = len(self.getPieces('w'))
+    var black = len(self.getPieces(Black))
+    var white = len(self.getPieces(White))
 
     return (black, white)

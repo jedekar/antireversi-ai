@@ -39,10 +39,10 @@ proc prepare*(): (Controller, Controller, CellIndex) =
     let blackHole = toCellIndex(readLine(stdin))
     let aiColor = readLine(stdin)
     if aiColor == "black":
-        playerOne = newController('b', getAiInput)
-        playerTwo = newController('w', getOpponentInput)
+        playerOne = newController(Black, getAiInput)
+        playerTwo = newController(White, getOpponentInput)
     else:
-        playerOne = newController('b', getOpponentInput)
-        playerTwo = newController('w', getAiInput)
+        playerOne = newController(Black, getOpponentInput)
+        playerTwo = newController(White, getAiInput)
 
     return (playerOne, playerTwo, blackHole)
