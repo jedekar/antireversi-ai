@@ -16,7 +16,12 @@ proc toOutput*(cellIndex: CellIndex): string =
     result = fmt"{Letters[x]}{Numbers[y]}"
 
 
-type Controller* = (Reversi, char) -> string
+type Controller* = ref object 
+    color*: char
+    getInput*: (Reversi, char) -> string
+
+proc newController*(color: char, getInput: (Reversi, char) -> string): Controller =
+    return Controller(color: color, getInput: getInput)
 
 proc getAiInput(game: Reversi, color: char): string =
     let coverage = game.getCoverage(color)
@@ -36,10 +41,10 @@ proc prepare*(): (Controller, Controller, CellIndex) =
     let blackHole = toCellIndex(readLine(stdin))
     let aiColor = readLine(stdin)
     if aiColor == "black":
-        playerOne = getAiInput
-        playerTwo = getOpponentInput
+        playerOne = newController('b', getAiInput)
+        playerTwo = newController('w', getOpponentInput)
     else:
-        playerOne = getOpponentInput
-        playerTwo = getAiInput
+        playerOne = newController('b', getOpponentInput)
+        playerTwo = newController('w', getAiInput)
 
     return (playerOne, playerTwo, blackHole)
