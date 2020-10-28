@@ -41,31 +41,31 @@ proc inverseof(color: char): char =
 
 
 proc isValidIndex(cellIndex: CellIndex): bool =
-    if (0 <= cellIndex[0] and 
-        cellIndex[0] < FieldSize and 
-        0 <= cellIndex[1] and 
-        cellIndex[1] < FieldSize):
+    if (0 <= cellIndex.y and 
+        cellIndex.y < FieldSize and 
+        0 <= cellIndex.x and 
+        cellIndex.x < FieldSize):
         return true
 
     return false
 
 
 proc getValidNeighbours(cellIndex: CellIndex): seq[CellIndex] =
-    let neighbours = [(cellIndex[0] - 1, cellIndex[1]),
-                      (cellIndex[0] - 1, cellIndex[1] + 1),
-                      (cellIndex[0], cellIndex[1] + 1),
-                      (cellIndex[0] + 1, cellIndex[1] + 1),
-                      (cellIndex[0] + 1, cellIndex[1]),
-                      (cellIndex[0] + 1, cellIndex[1] - 1),
-                      (cellIndex[0], cellIndex[1] - 1),
-                      (cellIndex[0] - 1, cellIndex[1] - 1)]
+    let neighbours = [(cellIndex.y - 1, cellIndex.x),
+                      (cellIndex.y - 1, cellIndex.x + 1),
+                      (cellIndex.y, cellIndex.x + 1),
+                      (cellIndex.y + 1, cellIndex.x + 1),
+                      (cellIndex.y + 1, cellIndex.x),
+                      (cellIndex.y + 1, cellIndex.x - 1),
+                      (cellIndex.y, cellIndex.x - 1),
+                      (cellIndex.y - 1, cellIndex.x - 1)]
     for n in neighbours:
         if isValidIndex(n):
             result.add(n)
 
 
 proc getInverseNeighbours(self: Reversi, cellIndex: CellIndex): seq[CellIndex] =
-    let inverse = inverseof(self.field[cellIndex[0]][cellIndex[1]])
+    let inverse = inverseof(self.field[cellIndex.y][cellIndex.x])
     let neighbours = getValidNeighbours(cellIndex)
     for n in neighbours:
         let neighbour_cell = self.field[n[0]][n[1]]
@@ -74,10 +74,10 @@ proc getInverseNeighbours(self: Reversi, cellIndex: CellIndex): seq[CellIndex] =
 
 
 proc findEmptyCell(self: Reversi, cellIndex: CellIndex, direction: Direction): CellIndex =
-    let color = self.field[cellIndex[0]][cellIndex[1]]
+    let color = self.field[cellIndex.y][cellIndex.x]
     let inverse = inverseof(color)
-    var y = cellIndex[0] + direction[0]
-    var x = cellIndex[1] + direction[1]
+    var y = cellIndex.y + direction.y
+    var x = cellIndex.x + direction.x
     while true:
         if not isValidIndex((y, x)):
             return InvalidCell
@@ -87,14 +87,14 @@ proc findEmptyCell(self: Reversi, cellIndex: CellIndex, direction: Direction): C
         if current == ' ':
             return (y, x)
         if current == color:
-            y += direction[0]
-            x += direction[1]
+            y += direction.y
+            x += direction.x
             continue
 
 
 proc getDirections(cellIndex: CellIndex, points: seq[CellIndex]): seq[Direction] =
     for p in points:
-        result.add((p[0] - cellIndex[0], p[1] - cellIndex[1]))
+        result.add((p[0] - cellIndex.y, p[1] - cellIndex.x))
 
 
 proc getAvailableMoves(self: Reversi, cellIndex: CellIndex): seq[CellIndex] =
@@ -132,23 +132,23 @@ proc getCoverage*(self: Reversi, color: char): Coverage =
 
 
 proc flipRow(self: Reversi, cellIndex: CellIndex, direction: Direction) =
-    let color = self.field[cellIndex[0]][cellIndex[1]]
+    let color = self.field[cellIndex.y][cellIndex.x]
     let inverse = inverseof(color)
-    var y = cellIndex[0] + direction[0]
-    var x = cellIndex[1] + direction[1]
+    var y = cellIndex.y + direction.y
+    var x = cellIndex.x + direction.x
     while true:
         let current = self.field[y][x]
         if current == inverse:
             self.field[y][x] = color
-            y += direction[0]
-            x += direction[1]
+            y += direction.y
+            x += direction.x
             continue
         break
 
 
 proc normalizeDirection(direction: Direction): Direction = 
-    let y = direction[0] 
-    let x = direction[1]
+    let y = direction.y 
+    let x = direction.x
     let ly = abs(y)
     let lx = abs(x)
     if ly > lx:
@@ -160,8 +160,8 @@ proc normalizeDirection(direction: Direction): Direction =
 
 
 proc flipPieces(self: Reversi, attacked: CellIndex, attackers: seq[CellIndex]) =
-    let color = self.field[attackers[0][0]][attackers[0][1]]
-    self.field[attacked[0]][attacked[1]] = color
+    let color = self.field[attackers[0].y][attackers[0].x]
+    self.field[attacked.y][attacked.x] = color
     let directions = map(getDirections(attacked, attackers), normalizeDirection)
     for d in directions:
         self.flipRow(attacked, d)

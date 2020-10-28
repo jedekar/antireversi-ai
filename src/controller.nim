@@ -11,9 +11,7 @@ proc toCellIndex*(inp: string): CellIndex =
 
 
 proc toOutput*(cellIndex: CellIndex): string =
-    let y = cellIndex[0]
-    let x = cellIndex[1]
-    result = fmt"{Letters[x]}{Numbers[y]}"
+    result = fmt"{Letters[cellIndex.x]}{Numbers[cellIndex.y]}"
 
 
 type Controller* = ref object 
