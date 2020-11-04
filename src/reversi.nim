@@ -21,9 +21,11 @@ type Direction = tuple
 type Coverage* = Table[CellIndex, seq[CellIndex]]
 
 
-type Reversi* = ref object
-    field: array[FieldSize, array[FieldSize, char]]
-    blackHole: CellIndex
+type 
+    Field* = array[FieldSize, array[FieldSize, char]]
+    Reversi* = ref object
+        field: Field
+        blackHole: CellIndex
 
 proc newReversi*(blackHole: CellIndex): Reversi =
     let field = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
@@ -36,6 +38,8 @@ proc newReversi*(blackHole: CellIndex): Reversi =
                  [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty]]
     return Reversi(field: field, blackHole: blackHole)
 
+proc fromInitialCond*(field: Field, blackHole: CellIndex): Reversi =
+    return Reversi(field: field, blackHole: blackHole)
 
 proc inverseof(color: char): char =
     if color == Black:
@@ -100,7 +104,7 @@ proc getDirections(cellIndex: CellIndex, points: seq[CellIndex]): seq[Direction]
         result.add((p[0] - cellIndex.y, p[1] - cellIndex.x))
 
 
-proc getAvailableMoves(self: Reversi, cellIndex: CellIndex): seq[CellIndex] =
+proc getAvailableMovesForPiece(self: Reversi, cellIndex: CellIndex): seq[CellIndex] =
     let n = self.getInverseNeighbours(cellIndex)
     let d = getDirections(cellIndex, n)
     for i in 0..<len(n):
@@ -120,7 +124,7 @@ proc getCoverageWithBlackHole(self: Reversi, color: char): Coverage =
     let pieces = self.getPieces(color)
 
     for p in pieces:
-        let moves = self.getAvailableMoves(p)
+        let moves = self.getAvailableMovesForPiece(p)
         for m in moves:
             if not result.hasKey(m):
                 result[m] = @[p]
@@ -133,6 +137,8 @@ proc getCoverage*(self: Reversi, color: char): Coverage =
     if result.hasKey(self.black_hole):
         result.del(self.black_hole)
 
+proc getAvailableMovesForColor*(self: Reversi, color: char): seq[CellIndex] = 
+    result = toSeq(self.getCoverage(color).keys)
 
 proc flipRow(self: Reversi, cellIndex: CellIndex, direction: Direction) =
     let color = self.field[cellIndex.y][cellIndex.x]

@@ -21,7 +21,7 @@ type Controller* = ref object
 proc newController*(color: char, getInput: (Reversi, char) -> string): Controller =
     return Controller(color: color, getInput: getInput)
 
-proc getAiInput(game: Reversi, color: char): string =
+proc getRandomInput(game: Reversi, color: char): string =
     let coverage = game.getCoverage(color)
     if coverage.len() > 0:
         randomize()
@@ -33,16 +33,21 @@ proc getAiInput(game: Reversi, color: char): string =
 proc getOpponentInput(game: Reversi, color: char): string =
     return readLine(stdin)
 
+proc getAiInput(game: Reversi, color: char): string =
+    result = "pass"
+
+proc newAiController*(color: char): Controller = 
+    return Controller(color: color, getInput: getAiInput)
 
 proc prepare*(): (Controller, Controller, CellIndex) =
     var playerOne, playerTwo: Controller
     let blackHole = toCellIndex(readLine(stdin))
     let aiColor = readLine(stdin)
     if aiColor == "black":
-        playerOne = newController(Black, getAiInput)
+        playerOne = newController(Black, getRandomInput)
         playerTwo = newController(White, getOpponentInput)
     else:
         playerOne = newController(Black, getOpponentInput)
-        playerTwo = newController(White, getAiInput)
+        playerTwo = newController(White, getRandomInput)
 
     return (playerOne, playerTwo, blackHole)
