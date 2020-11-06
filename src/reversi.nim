@@ -10,7 +10,7 @@ type CellIndex* = tuple
     y: int
     x: int
 
-const InvalidCell = (-1, -1)
+const InvalidCell* = (-1, -1)
 
 
 type Direction = tuple
@@ -41,7 +41,7 @@ proc newReversi*(blackHole: CellIndex): Reversi =
 proc fromInitialCond*(field: Field, blackHole: CellIndex): Reversi =
     return Reversi(field: field, blackHole: blackHole)
 
-proc inverseof(color: char): char =
+proc inverseof*(color: char): char =
     if color == Black:
         return White
     return Black
@@ -188,9 +188,11 @@ proc makeTurn*(self: Reversi, cellIndex: CellIndex, color: char) =
     let coverage = self.getCoverage(color)
     self.flipPieces(cellIndex, coverage[cellIndex])
 
+proc calculateScoreForColor*(self: Reversi, color: char): int = 
+    result = len(self.getPieces(color))
 
 proc calculateScore*(self: Reversi): (int, int) =
-    var black = len(self.getPieces(Black))
-    var white = len(self.getPieces(White))
+    var black = self.calculateScoreForColor(Black)
+    var white = self.calculateScoreForColor(White)
 
     return (black, white)
