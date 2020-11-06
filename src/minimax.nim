@@ -2,7 +2,7 @@ import sugar, sequtils
 import reversi
 
 proc copyGameWithMovesMadeBy(game: Reversi, color: char): seq[Reversi] = 
-    let moves = game.getAvailableMovesForColor(color)
+    let moves = game.getAvailableMovesFor(color)
     for i in 0..<len(moves):
         result.add(deepCopy(game))
         result[i].makeTurn(moves[i], color)
@@ -28,7 +28,7 @@ proc minimax*(game: Reversi, color: char, depth: int): MinimaxTree =
 
     let inverse = inverseof(color)
     let tree = newMinimaxTree()
-    let moves = game.getAvailableMovesForColor(color)
+    let moves = game.getAvailableMovesFor(color)
     if len(moves) == 0 or depth == 0:
         return tree
 

@@ -18,7 +18,7 @@ type Direction = tuple
     x: int
 
 
-type Coverage* = Table[CellIndex, seq[CellIndex]]
+type Coverage = Table[CellIndex, seq[CellIndex]]
 
 
 type 
@@ -132,12 +132,12 @@ proc getCoverageWithBlackHole(self: Reversi, color: char): Coverage =
                 result[m].add(p)
 
 
-proc getCoverage*(self: Reversi, color: char): Coverage =
+proc getCoverage(self: Reversi, color: char): Coverage =
     result = self.getCoverageWithBlackHole(color)
     if result.hasKey(self.black_hole):
         result.del(self.black_hole)
 
-proc getAvailableMovesForColor*(self: Reversi, color: char): seq[CellIndex] = 
+proc getAvailableMovesFor*(self: Reversi, color: char): seq[CellIndex] = 
     result = toSeq(self.getCoverage(color).keys)
 
 proc flipRow(self: Reversi, cellIndex: CellIndex, direction: Direction) =

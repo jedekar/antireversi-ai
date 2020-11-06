@@ -1,4 +1,4 @@
-import strformat, tables, sugar, random, sequtils
+import strformat, sugar, random
 import reversi, minimax
 
 const Letters = "ABCDEFGH"
@@ -14,10 +14,10 @@ proc toOutput*(cellIndex: CellIndex): string =
 
 
 proc getRandomInput(game: Reversi, color: char): string =
-    let coverage = game.getCoverage(color)
-    if coverage.len() > 0:
+    let moves = game.getAvailableMovesFor(color) 
+    if moves.len() > 0:
         randomize()
-        let move = toOutput(sample(toSeq(coverage.keys)))
+        let move = toOutput(sample(moves))
         echo move
         return move
     return "pass"
