@@ -39,21 +39,13 @@ proc copyGameWithMovesMadeBy(game: Reversi, color: char): seq[Reversi] =
         result.add(deepCopy(game))
         result[i].makeTurn(moves[i], color)
 
-type 
-    MinimaxTreeKind = enum Marked, Other
-    MinimaxTree = ref object
-        value*: int
-        body*: seq[MinimaxTree]
-        case kind: MinimaxTreeKind
-            of Marked: move*: CellIndex
-            of Other: discard
+type MinimaxTree = ref object
+    value*: int
+    move*: CellIndex
+    body*: seq[MinimaxTree]
 
-proc newMinimaxTree(kind: MinimaxTreeKind): MinimaxTree =
-    case kind:
-        of Marked: 
-            return MinimaxTree(value: -1, body: @[], kind: kind, move: InvalidCell)
-        of Other: 
-            return MinimaxTree(value: -1, body: @[], kind: kind)
+proc newMinimaxTree(): MinimaxTree =
+    return MinimaxTree(value: -1, move: InvalidCell, body: @[])
 
 proc getMoveWithMaxValue(trees: seq[MinimaxTree]): CellIndex = 
     var value = 0
@@ -65,8 +57,9 @@ proc getMoveWithMaxValue(trees: seq[MinimaxTree]): CellIndex =
 proc minimax(game: Reversi, color: char, depth: int): MinimaxTree =
     proc min(s: seq[MinimaxTree]): MinimaxTree =
         result = s[minIndex(map(s, (a) => a.value))]
+
     let inverse = inverseof(color)
-    let tree = newMinimaxTree(Marked)
+    let tree = newMinimaxTree()
     let moves = game.getAvailableMovesForColor(color)
     if len(moves) == 0 or depth == 0:
         return tree
