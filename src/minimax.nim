@@ -39,6 +39,9 @@ proc minimax*(game: Reversi, color: char, depth: int): MinimaxTree =
         if depth == 1:
             tree.body[i].value = level[i].calculateScoreForColor(color)
         else:
-            tree.body[i].value = min(tree.body[i].body).value
+            try:
+                tree.body[i].value = min(tree.body[i].body).value
+            except IndexError:
+                tree.body[i].value = 1000
 
     return tree
