@@ -22,7 +22,7 @@ proc getRandomInput(game: Reversi, color: char): string =
         return move
     return "pass"
 
-proc getOpponentInput(game: Reversi, color: char): string =
+proc getConsoleInput(game: Reversi, color: char): string =
     return readLine(stdin)
 
 proc getAiInput(game: Reversi, color: char): string =
@@ -41,9 +41,9 @@ proc newRandomController*(color: char): Controller =
     return Controller(color: color,
                       getInput: (game: Reversi) => getRandomInput(game, color))
 
-proc newOpponentController*(color: char): Controller =
+proc newConsoleController*(color: char): Controller =
     return Controller(color: color,
-                      getInput: (game: Reversi) => getOpponentInput(game, color))
+                      getInput: (game: Reversi) => getConsoleInput(game, color))
 
 proc newAiController*(color: char): Controller = 
     return Controller(color: color, 
