@@ -9,17 +9,9 @@ proc toCellIndex*(inp: string): CellIndex =
     let x = Letters.find(inp[0])
     return (y, x)
 
-
 proc toOutput*(cellIndex: CellIndex): string =
     result = fmt"{Letters[cellIndex.x]}{Numbers[cellIndex.y]}"
 
-
-type Controller* = ref object 
-    color*: char
-    getInput*: (Reversi, char) -> string
-
-proc newController*(color: char, getInput: (Reversi, char) -> string): Controller =
-    return Controller(color: color, getInput: getInput)
 
 proc getRandomInput(game: Reversi, color: char): string =
     let coverage = game.getCoverage(color)
@@ -40,18 +32,33 @@ proc getAiInput(game: Reversi, color: char): string =
 
     result = toOutput(getMoveWithMaxValue(tree.body))
 
+
+type Controller* = ref object 
+    color*: char
+    getInput*: (Reversi) -> string
+
+proc newRandomController*(color: char): Controller =
+    return Controller(color: color,
+                      getInput: (game: Reversi) => getRandomInput(game, color))
+
+proc newOpponentController*(color: char): Controller =
+    return Controller(color: color,
+                      getInput: (game: Reversi) => getOpponentInput(game, color))
+
 proc newAiController*(color: char): Controller = 
-    return Controller(color: color, getInput: getAiInput)
+    return Controller(color: color, 
+                      getInput: (game: Reversi) => getAiInput(game, color))
+
 
 proc prepare*(): (Controller, Controller, CellIndex) =
     var playerOne, playerTwo: Controller
     let blackHole = toCellIndex(readLine(stdin))
     let aiColor = readLine(stdin)
     if aiColor == "black":
-        playerOne = newController(Black, getRandomInput)
-        playerTwo = newController(White, getOpponentInput)
+        playerOne = newAiController(Black)
+        playerTwo = newRandomController(White)
     else:
-        playerOne = newController(Black, getOpponentInput)
-        playerTwo = newController(White, getRandomInput)
+        playerOne = newRandomController(Black)
+        playerTwo = newAiController(White)
 
     return (playerOne, playerTwo, blackHole)

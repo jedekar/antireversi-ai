@@ -21,7 +21,7 @@ suite "minimax ai must":
         let blackHole = (0, 0)
         let game = fromInitialCond(field, blackHole)
         let aiPlayer = newAiController(Black)
-        doAssert "pass" == aiPlayer.getInput(game, aiPlayer.color)                   
+        doAssert "pass" == aiPlayer.getInput(game)                   
 
     test "choose the most winning move":
         var field: Field = [[Empty, Empty, Empty, White, Empty, Empty, Empty, Empty],
@@ -35,6 +35,6 @@ suite "minimax ai must":
         let blackHole = (0, 0)
         let game = fromInitialCond(field, blackHole)
         let aiPlayerBlack = newAiController(Black)
-        doAssert "F5" == aiPlayerBlack.getInput(game, aiPlayerBlack.color)
+        doAssert "F5" == aiPlayerBlack.getInput(game)
         let aiPlayerWhite = newAiController(White)
-        doAssert "D6" == aiPlayerWhite.getInput(game, aiPlayerWhite.color)
+        doAssert "D6" == aiPlayerWhite.getInput(game)

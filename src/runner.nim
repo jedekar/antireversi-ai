@@ -12,7 +12,7 @@ proc newRunner*(playerOne: Controller, playerTwo: Controller): Runner =
 
 
 proc processPlayer(self: Runner, game: Reversi, player: Controller) =
-    let inp = player.getInput(game, player.color)
+    let inp = player.getInput(game)
     if not (inp == "pass"):
         let move = toCellIndex(inp)
         game.makeTurn(move, player.color)
