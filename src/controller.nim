@@ -29,9 +29,11 @@ proc getConsoleInput(game: Reversi, color: char): string =
 proc getAiInput(game: Reversi, color: char): string =
     let tree = minimax(game, color, 2)
     if len(tree.body) == 0:
+        echo Pass
         return Pass
 
     result = toOutput(getMoveWithMaxValue(tree.body))
+    echo result
 
 
 type Controller* = ref object 
@@ -57,9 +59,9 @@ proc prepare*(): (Controller, Controller, CellIndex) =
     let aiColor = readLine(stdin)
     if aiColor == "black":
         playerOne = newAiController(Black)
-        playerTwo = newRandomController(White)
+        playerTwo = newConsoleController(White)
     else:
-        playerOne = newRandomController(Black)
+        playerOne = newConsoleController(Black)
         playerTwo = newAiController(White)
 
     return (playerOne, playerTwo, blackHole)
