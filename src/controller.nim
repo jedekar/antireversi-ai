@@ -4,6 +4,8 @@ import reversi, minimax
 const Letters = "ABCDEFGH"
 const Numbers = "12345678"
 
+const Pass = "pass"
+
 proc toCellIndex*(inp: string): CellIndex =
     let y = Numbers.find(inp[1])
     let x = Letters.find(inp[0])
@@ -18,9 +20,8 @@ proc getRandomInput(game: Reversi, color: char): string =
     if moves.len() > 0:
         randomize()
         let move = toOutput(sample(moves))
-        echo move
         return move
-    return "pass"
+    return Pass
 
 proc getConsoleInput(game: Reversi, color: char): string =
     return readLine(stdin)
@@ -28,7 +29,7 @@ proc getConsoleInput(game: Reversi, color: char): string =
 proc getAiInput(game: Reversi, color: char): string =
     let tree = minimax(game, color, 2)
     if len(tree.body) == 0:
-        return "pass"
+        return Pass
 
     result = toOutput(getMoveWithMaxValue(tree.body))
 
