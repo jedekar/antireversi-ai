@@ -27,12 +27,12 @@ proc getConsoleInput(game: Reversi, color: char): string =
     return readLine(stdin)
 
 proc getAiInput(game: Reversi, color: char): string =
-    let tree = minimax(game, color, 2)
-    if len(tree.body) == 0:
+    let node = alphabeta(game, color, 6, -Infinity, Infinity)
+    if node.move == InvalidCell:
         echo Pass
         return Pass
 
-    result = toOutput(getMoveWithMaxValue(tree.body))
+    result = toOutput(node.move)
     echo result
 
 

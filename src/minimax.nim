@@ -1,7 +1,6 @@
-import sugar, sequtils
 import reversi
 
-const Infinity = 1000
+const Infinity* = 1000
 
 proc copyGameWithMovesMadeBy(game: Reversi, color: char): seq[Reversi] = 
     let moves = game.getAvailableMovesFor(color)
@@ -9,42 +8,33 @@ proc copyGameWithMovesMadeBy(game: Reversi, color: char): seq[Reversi] =
         result.add(deepCopy(game))
         result[i].makeTurn(moves[i], color)
 
-type MinimaxTree = ref object
+type MinimaxNode = ref object
     value*: int
     move*: CellIndex
-    body*: seq[MinimaxTree]
 
-proc newMinimaxTree(): MinimaxTree =
-    return MinimaxTree(value: -1, move: InvalidCell, body: @[])
+proc newMinimaxNode(): MinimaxNode =
+    return MinimaxNode(value: -1, move: InvalidCell)
 
-proc minimax*(game: Reversi, color: char, depth: int): MinimaxTree =
-    proc min(s: seq[MinimaxTree]): MinimaxTree =
-        result = s[minIndex(map(s, (a) => a.value))]
-
+proc alphabeta*(
+    game: Reversi, color: char, depth: int, alpha: int, beta: int): MinimaxNode =
+    var alpha = alpha
     let inverse = inverseof(color)
-    let tree = newMinimaxTree()
+    let node = newMinimaxNode()
     let moves = game.getAvailableMovesFor(color)
     if depth == 0 or len(moves) == 0:
-        tree.value = game.calculateScoreForColor(color)
-        return tree
+        node.value = game.calculateScoreForColor(inverse)
+        return node
 
     let level = game.copyGameWithMovesMadeBy(color)
 
+    node.value = -Infinity
     for i in 0..<len(level):
-        tree.body.add(minimax(level[i], inverse, depth-1))
-        tree.body[i].move = moves[i]
+        var prev = node.value
+        node.value = max(node.value,
+                         -alphabeta(level[i], inverse, depth-1, -beta, -alpha).value)
+        if prev != node.value: node.move = moves[i]
+        alpha = max(alpha, node.value)
+        if alpha >= beta:
+            break
     
-    let negamax = if (depth mod 2) == 0: -1 else: 1
-    try:
-        tree.value = negamax * min(tree.body).value
-    except IndexError:
-        tree.value = negamax * Infinity
-
-    return tree
-
-proc getMoveWithMaxValue*(trees: seq[MinimaxTree]): CellIndex = 
-    var value = Infinity
-    for i in 0..<len(trees):
-        if value > trees[i].value:
-            value = trees[i].value
-            result = trees[i].move
+    return node
